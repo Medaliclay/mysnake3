@@ -1,0 +1,264 @@
+:root {
+  --bg: #0b1020;
+  --bg-2: #121a33;
+  --panel: rgba(18, 26, 51, 0.85);
+  --border: #24305a;
+  --text: #e6ebff;
+  --muted: #8f9bc7;
+  --snake: #39ff88;
+  --snake-2: #0fd1a0;
+  --food: #ff3d6e;
+  --bonus: #ffd23d;
+  --accent: #7c5cff;
+  --radius: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(124, 92, 255, 0.25), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, rgba(57, 255, 136, 0.15), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a { color: var(--snake); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0.1em 0.45em;
+  border: 1px solid var(--border);
+  border-bottom-width: 3px;
+  border-radius: 6px;
+  background: var(--bg-2);
+  font-family: inherit;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px clamp(16px, 4vw, 48px);
+  background: rgba(11, 16, 32, 0.75);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.brand { display: flex; align-items: center; gap: 10px; color: var(--text); }
+.brand:hover { text-decoration: none; }
+.brand span { font-family: "Press Start 2P", monospace; font-size: 0.8rem; letter-spacing: 1px; }
+.site-header nav { display: flex; gap: clamp(12px, 3vw, 28px); }
+.site-header nav a { color: var(--muted); font-weight: 600; font-size: 0.95rem; }
+.site-header nav a:hover { color: var(--text); text-decoration: none; }
+
+/* ---------- Hero / game ---------- */
+main { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+
+.hero {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 520px);
+  gap: 48px;
+  align-items: center;
+  padding: 56px 0 72px;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  line-height: 1.15;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+.glow {
+  color: var(--snake);
+  text-shadow: 0 0 18px rgba(57, 255, 136, 0.55);
+}
+.hero p { color: var(--muted); font-size: 1.1rem; max-width: 460px; }
+
+.game-wrap { width: 100%; }
+
+.hud {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 12px;
+}
+.stat {
+  flex: 1;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 12px;
+  display: flex; flex-direction: column;
+}
+.stat .label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
+.stat .value { font-family: "Press Start 2P", monospace; font-size: 1rem; margin-top: 4px; }
+.hud-actions { display: flex; gap: 8px; }
+
+.icon-btn {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.2s;
+}
+.icon-btn:hover { border-color: var(--snake); }
+.icon-btn:active { transform: scale(0.94); }
+
+.board {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 0 0 1px rgba(57, 255, 136, 0.08), 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 60px rgba(57, 255, 136, 0.08);
+  touch-action: none;
+}
+.board.shake { animation: shake 0.35s; }
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-6px, 3px); }
+  40% { transform: translate(5px, -4px); }
+  60% { transform: translate(-4px, 2px); }
+  80% { transform: translate(3px, -2px); }
+}
+
+canvas { display: block; width: 100%; height: 100%; background: #070b18; }
+
+.overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(7, 11, 24, 0.72);
+  backdrop-filter: blur(4px);
+  transition: opacity 0.25s;
+  padding: 16px;
+}
+.overlay.hidden { opacity: 0; pointer-events: none; }
+
+.panel { text-align: center; max-width: 340px; }
+.panel h2 {
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(1rem, 4vw, 1.4rem);
+  color: var(--snake);
+  text-shadow: 0 0 16px rgba(57, 255, 136, 0.6);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.panel p { color: var(--muted); margin-bottom: 18px; }
+
+.options {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-bottom: 20px; text-align: left;
+  background: var(--bg-2); border: 1px solid var(--border);
+  padding: 14px; border-radius: 12px;
+}
+.options label { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 0.95rem; }
+.options label.check { justify-content: flex-start; cursor: pointer; }
+.options select {
+  background: var(--bg); color: var(--text);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 6px 10px; font: inherit;
+}
+.options input[type="checkbox"] { accent-color: var(--snake); width: 18px; height: 18px; }
+
+.primary {
+  font: 800 1rem "Inter", sans-serif;
+  padding: 14px 28px;
+  border: none; border-radius: 999px;
+  background: linear-gradient(135deg, var(--snake), var(--snake-2));
+  color: #04120b;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(57, 255, 136, 0.35);
+  transition: transform 0.12s, box-shadow 0.2s;
+}
+.primary:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(57, 255, 136, 0.5); }
+.primary:active { transform: translateY(0); }
+.hint { font-size: 0.8rem; margin-top: 12px; margin-bottom: 0 !important; }
+
+/* D-pad (shown on touch devices) */
+.dpad {
+  display: none;
+  grid-template-columns: repeat(3, 64px);
+  grid-template-rows: repeat(2, 64px);
+  gap: 8px;
+  justify-content: center;
+  margin-top: 16px;
+}
+.dpad button {
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 1.3rem;
+  touch-action: manipulation;
+}
+.dpad button:active { background: var(--snake); color: #04120b; }
+.dpad [data-dir="up"] { grid-column: 2; grid-row: 1; }
+.dpad [data-dir="left"] { grid-column: 1; grid-row: 2; }
+.dpad [data-dir="down"] { grid-column: 2; grid-row: 2; }
+.dpad [data-dir="right"] { grid-column: 3; grid-row: 2; }
+@media (hover: none) and (pointer: coarse) { .dpad { display: grid; } }
+
+/* ---------- How to play ---------- */
+.how, .about { padding: 56px 0; border-top: 1px solid var(--border); }
+.how h2, .about h2 { font-size: 1.8rem; margin-bottom: 24px; }
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.card:hover { transform: translateY(-4px); border-color: var(--accent); }
+.card-icon { font-size: 1.6rem; height: 36px; display: flex; align-items: center; margin-bottom: 8px; }
+.card h3 { font-size: 1.1rem; margin-bottom: 6px; }
+.card p { color: var(--muted); font-size: 0.95rem; }
+
+.dot { width: 22px; height: 22px; border-radius: 50%; display: inline-block; }
+.dot.food { background: var(--food); box-shadow: 0 0 14px var(--food); }
+.dot.bonus { background: var(--bonus); box-shadow: 0 0 14px var(--bonus); }
+
+.about p { color: var(--muted); max-width: 720px; font-size: 1.05rem; }
+
+/* ---------- Footer ---------- */
+.site-footer {
+  text-align: center;
+  padding: 28px 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; gap: 28px; padding-top: 32px; }
+  .hero-text { text-align: center; }
+  .hero p { margin: 0 auto; }
+  .game-wrap { max-width: 520px; margin: 0 auto; }
+}
+@media (max-width: 480px) {
+  .brand span { display: none; }
+  .stat .value { font-size: 0.85rem; }
+  .icon-btn { width: 40px; height: 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
